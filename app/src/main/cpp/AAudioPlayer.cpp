@@ -111,14 +111,16 @@ AAudioPlayer::data_callback(AAudioStream *stream, void *userData, void *audioDat
     if (player->source_fin.is_open()) {
         player -> source_fin.read(reinterpret_cast<char *>(audioData), numFrames * 2 * 2);
         if (player -> source_fin.eof()) {
+            LOGD("Play completed!");
             thread cop_handler(completed_proc, player);
-            cop_handler.join();
+            cop_handler.detach();
         }
     } else return AAUDIO_CALLBACK_RESULT_STOP;
     return AAUDIO_CALLBACK_RESULT_CONTINUE;
 }
 
 void completed_proc(AAudioPlayer *player) {
+    LOGD("completed_proc called");
     player -> stop();
     player -> seek_to(0);
 }
