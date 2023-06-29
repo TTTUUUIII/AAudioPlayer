@@ -34,8 +34,9 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
         final AudioDeviceInfo[] devices = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
         for (AudioDeviceInfo device : devices) {
-            if (device.getType() == AudioDeviceInfo.TYPE_BUILTIN_SPEAKER) {
+            if (device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP) {
                 mPlayer = new AAudioPlayer(device.getId(), 44100, 2);
+                mPlayer.setLoop(true);
             }
         }
     }

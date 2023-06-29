@@ -20,5 +20,6 @@ public class AAudioPlayer {
     public native void seekTo(float rp);
     public native boolean isPrepared();
     public native boolean isPlaying();
+    public native void setLoop(boolean isLoop);
     public native void reset();
 }

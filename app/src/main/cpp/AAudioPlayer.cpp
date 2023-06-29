@@ -75,6 +75,15 @@ void AAudioPlayer::seek_to(float rp) {
     }
 }
 
+void AAudioPlayer::setLoop(bool is_loop) {
+    LOGD("AAudioPlayer::setLoop %d", is_loop);
+    _is_loop = is_loop;
+}
+
+bool AAudioPlayer::is_loop() {
+    return _is_loop;
+}
+
 bool AAudioPlayer::is_prepared() {
     return _is_prepared;
 }
@@ -111,7 +120,6 @@ AAudioPlayer::data_callback(AAudioStream *stream, void *userData, void *audioDat
     if (player->source_fin.is_open()) {
         player -> source_fin.read(reinterpret_cast<char *>(audioData), numFrames * 2 * 2);
         if (player -> source_fin.eof()) {
-            LOGD("Play completed!");
             thread cop_handler(completed_proc, player);
             cop_handler.detach();
         }
@@ -123,6 +131,9 @@ void completed_proc(AAudioPlayer *player) {
     LOGD("completed_proc called");
     player -> reset();
     player -> prepare();
+    if (player -> is_loop()) {
+        player -> start();
+    }
 }
 
 void error_proc(AAudioStream *stream, void *userData) {

@@ -21,11 +21,14 @@ public:
     void reset();
     void release();
     void seek_to(float rp);
+    void setLoop(bool is_loop);
     bool is_prepared();
     bool is_playing();
+    bool is_loop();
     AAudioPlayer(uint8_t device_id, uint16_t sample_rate, uint8_t channel_count);
     ~AAudioPlayer();
 private:
+    bool _is_loop = false;
     bool _is_prepared = false;
     bool _is_playing = false;
     aaudio_stream_state_t state;

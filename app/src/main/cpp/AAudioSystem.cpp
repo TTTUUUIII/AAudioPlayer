@@ -124,3 +124,10 @@ Java_cn_touchair_aaudioplayer_AAudioPlayer_reset(JNIEnv *env, jobject thiz) {
     AAudioPlayer *player = find_player_by_obj(env, thiz);
     if (player != nullptr) player -> reset();
 }
+
+extern "C"
+JNIEXPORT void JNICALL
+Java_cn_touchair_aaudioplayer_AAudioPlayer_setLoop(JNIEnv *env, jobject thiz, jboolean is_loop) {
+    AAudioPlayer *player = find_player_by_obj(env, thiz);
+    if (player != nullptr) player -> setLoop(is_loop);
+}
