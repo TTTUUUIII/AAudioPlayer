@@ -121,8 +121,8 @@ AAudioPlayer::data_callback(AAudioStream *stream, void *userData, void *audioDat
 
 void completed_proc(AAudioPlayer *player) {
     LOGD("completed_proc called");
-    player -> stop();
-    player -> seek_to(0);
+    player -> reset();
+    player -> prepare();
 }
 
 void error_proc(AAudioStream *stream, void *userData) {
