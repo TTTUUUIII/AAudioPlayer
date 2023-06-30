@@ -2,13 +2,17 @@ package cn.touchair.aaudioplayer;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.recyclerview.widget.LinearLayoutManager;
+import androidx.recyclerview.widget.RecyclerView;
 
 import android.Manifest;
 import android.content.pm.PackageManager;
+import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
-import android.util.Log;
+import android.view.LayoutInflater;
 import android.view.View;
+import android.view.ViewGroup;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import java.io.File;
@@ -21,26 +25,34 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final Path SCAN_SOURCE_PATH = Paths.get(String.format("/sdcard/Android/media/%s/Music", MainActivity.class.getPackage().getName()));
+
     private static final int REQ_CODE_R_W_EXTERNAL_STORAGE = 1;
     private AAudioPlayer mPlayer;
+    private PlayListViewAdapter mAdapter;
     private ActivityMainBinding binding;
 
     private boolean mIsPermissionGranted = false;
+    private String mSelectedSourceName = "";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
+        mPlayer = new AAudioPlayer(AAudioPlayer.SAMPLE_RATE_44100K, AAudioPlayer.CHANNEL_OUT_STEREO);
+        mPlayer.setLoop(true);
+        mIsLoopMode = true;
+        mAdapter = new PlayListViewAdapter();
         setContentView(binding.getRoot());
         requestPermission();
+        binding.playListRecyclerView.setLayoutManager(new LinearLayoutManager(this));
+        binding.playListRecyclerView.setAdapter(mAdapter);
+        mAdapter.submit(findPlayList());
+        binding.scanPathTextView.setText(SCAN_SOURCE_PATH.toString());
         binding.pauseBtn.setOnClickListener(this);
         binding.startBtn.setOnClickListener(this);
         binding.restartBtn.setOnClickListener(this);
         binding.resetBtn.setOnClickListener(this);
-        binding.setSourceBtn.setOnClickListener(this);
-        mPlayer = new AAudioPlayer(AAudioPlayer.SAMPLE_RATE_44100K, AAudioPlayer.CHANNEL_OUT_STEREO);
-        mPlayer.setLoop(true);
-        mIsLoopMode = true;
         updateUI();
     }
 
@@ -49,7 +61,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStop();
         if (mPlayer.isPlaying()) {
             mPlayer.stop();
-            binding.stateTextView.setText("STATE_STOPPED");
+            binding.stateTextView.setText("STOPPED");
         }
     }
 
@@ -64,59 +76,45 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.pause_btn:
                 mPlayer.pause();
-                mCurrentStatus = "STATE_PAUSED";
+                mCurrentStatus = "PAUSED";
                 updateUI();
                 break;
             case R.id.start_btn:
                 mPlayer.start();
-                mCurrentStatus = "STATE_STARED";
+                mCurrentStatus = "STARED";
                 updateUI();
                 break;
             case R.id.restart_btn:
                 mPlayer.seekTo(0);
                 break;
-            case R.id.set_source_btn:
-                if (!mIsPermissionGranted) {
-                    Toast.makeText(getApplicationContext(), "设置失败，权限不足！", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-                final Path path = Paths.get((binding.editText.getText().toString()));
-                if (path.toFile().exists()) {
-                    mPlayer.setDatasource(path.toString());
-                    mPlayer.prepare();
-                    mIsShowControlPanel = true;
-                    mIsShowSourcePanel = false;
-                    mCurrentStatus = "STATE_PREPARED";
-                    updateUI();
-                } else {
-                    Toast.makeText(getApplicationContext(), "文件不存在！", Toast.LENGTH_SHORT).show();
-                }
-                break;
             case R.id.reset_btn:
                 mPlayer.reset();
-                mCurrentStatus = "STATE_UNINITIALIZED";
+                mCurrentStatus = "UNINITIALIZED";
                 mIsShowControlPanel = false;
-                mIsShowSourcePanel = true;
+                mIsSelectedMode = true;
+                mSelectedSourceName = "";
                 updateUI();
                 break;
         }
     }
 
     private boolean mIsShowControlPanel = false;
-    private boolean mIsShowSourcePanel = true;
 
     private boolean mIsLoopMode = false;
 
-    private String mCurrentStatus = "STATE_UNINITIALIZED";
+    private boolean mIsSelectedMode = true;
+
+    private String mCurrentStatus = "UNINITIALIZED";
 
     public void updateUI() {
-        binding.setSourceBtn.setEnabled(mIsShowSourcePanel);
         binding.startBtn.setEnabled(mIsShowControlPanel);
         binding.pauseBtn.setEnabled(mIsShowControlPanel);
         binding.restartBtn.setEnabled(mIsShowControlPanel);
         binding.resetBtn.setEnabled(mIsShowControlPanel);
         binding.stateTextView.setText(mCurrentStatus);
         binding.isLoopModeTextView.setText(mIsLoopMode ? "YES" : "NO");
+        binding.isSelectMode.setText(mIsSelectedMode ? "YES" : "NO");
+        mAdapter.notifyDataSetChanged();
     }
 
     @Override
@@ -134,5 +132,68 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
             requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQ_CODE_R_W_EXTERNAL_STORAGE);
         } else mIsPermissionGranted = true;
+    }
+
+    private String[] findPlayList() {
+        String[] playList = new String[0];
+        final File sourceDir = SCAN_SOURCE_PATH.toFile();
+        if (sourceDir.exists()) {
+            playList = sourceDir.list(((dir, name) -> name.endsWith(".pcm")));
+        }
+        return playList;
+    }
+
+    private class PlayListViewHolder extends RecyclerView.ViewHolder {
+
+        public PlayListViewHolder(@NonNull View itemView) {
+            super(itemView);
+        }
+
+        public void bind(String itemData) {
+            final TextView textView = (TextView) (TextView) itemView;
+            textView.setText(itemData);
+            textView.setEnabled(mIsSelectedMode);
+            textView.setTextColor(mIsSelectedMode ? Color.GREEN : Color.GRAY);
+            if (itemData.equals(mSelectedSourceName)) textView.setTextColor(Color.RED);
+            itemView.setOnClickListener(v -> {
+                if (mIsPermissionGranted) {
+                    mIsSelectedMode = false;
+                    mIsShowControlPanel = true;
+                    mSelectedSourceName = itemData;
+                    mPlayer.setDatasource(SCAN_SOURCE_PATH.resolve(itemData).toString());
+                    mPlayer.prepare();
+                    updateUI();
+                } else {
+                    Toast.makeText(getApplicationContext(), "没有足够的权限打开文件！", Toast.LENGTH_SHORT).show();
+                }
+            });
+        }
+    }
+
+    private class PlayListViewAdapter extends RecyclerView.Adapter<PlayListViewHolder> {
+        private String[] data = new String[0];
+
+        @NonNull
+        @Override
+        public PlayListViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+            final LayoutInflater inflater = LayoutInflater.from(parent.getContext());
+            final View itemView = inflater.inflate(R.layout.item_player_source, parent, false);
+            return new PlayListViewHolder(itemView);
+        }
+
+        @Override
+        public void onBindViewHolder(@NonNull MainActivity.PlayListViewHolder holder, int position) {
+            holder.bind(data[position]);
+        }
+
+        @Override
+        public int getItemCount() {
+            return data.length;
+        }
+
+        public void submit(String[] data) {
+            this.data = data;
+            notifyDataSetChanged();
+        }
     }
 }
