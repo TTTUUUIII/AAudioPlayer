@@ -75,7 +75,7 @@ void AAudioPlayer::seek_to(float rp) {
     }
 }
 
-void AAudioPlayer::setLoop(bool is_loop) {
+void AAudioPlayer::set_loop(bool is_loop) {
     LOG_D("AAudioPlayer::setLoop %d", is_loop);
     _is_loop = is_loop;
 }

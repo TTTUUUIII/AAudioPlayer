@@ -21,7 +21,7 @@ public:
     void reset();
     void release();
     void seek_to(float rp);
-    void setLoop(bool is_loop);
+    void set_loop(bool is_loop);
     bool is_prepared();
     bool is_playing();
     bool is_loop();

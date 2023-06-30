@@ -128,5 +128,5 @@ extern "C"
 JNIEXPORT void JNICALL
 Java_cn_touchair_aaudioplayer_AAudioPlayer_setLoop(JNIEnv *env, jobject thiz, jboolean is_loop) {
     AAudioPlayer *player = find_player_by_obj(env, thiz);
-    if (player != nullptr) player -> setLoop(is_loop);
+    if (player != nullptr) player -> set_loop(is_loop);
 }
