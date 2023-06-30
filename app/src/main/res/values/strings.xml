@@ -1,6 +1,6 @@
 <resources>
     <string name="app_name">AAudioPlayer</string>
     <string name="about_player">
-        支持格式：PCM\n支持采样：44100K, 48000K\n支持位深：16Bit\n支持通道：单声道，立体声
+        支持格式：PCM\n支持采样：44100K, 48000K\n支持位深：16Bit\n支持通道：单声道，立体声\n关\t\t\t\t\t\t于：https://github.com/TTTUUUIII
     </string>
 </resources>
