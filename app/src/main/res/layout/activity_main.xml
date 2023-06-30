@@ -11,7 +11,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="输入PCM文件路径"
-        android:text="/data/data/cn.touchair.aaudioplayer/files/Midnight City.pcm"
+        android:text="/data/data/cn.touchair.aaudioplayer/files/test.pcm"
         app:layout_constraintEnd_toStartOf="@+id/set_source_btn"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />

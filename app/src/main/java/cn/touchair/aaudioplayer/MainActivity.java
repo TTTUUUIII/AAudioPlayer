@@ -2,8 +2,6 @@ package cn.touchair.aaudioplayer;
 
 import androidx.appcompat.app.AppCompatActivity;
 
-import android.media.AudioDeviceInfo;
-import android.media.AudioManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -19,7 +17,6 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private AAudioPlayer mPlayer;
     private ActivityMainBinding binding;
-    private AudioManager mAudioManager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,14 +28,8 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.restartBtn.setOnClickListener(this);
         binding.resetBtn.setOnClickListener(this);
         binding.setSourceBtn.setOnClickListener(this);
-        mAudioManager = (AudioManager) getSystemService(AUDIO_SERVICE);
-        final AudioDeviceInfo[] devices = mAudioManager.getDevices(AudioManager.GET_DEVICES_OUTPUTS);
-        for (AudioDeviceInfo device : devices) {
-            if (device.getType() == AudioDeviceInfo.TYPE_BLUETOOTH_A2DP) {
-                mPlayer = new AAudioPlayer(device.getId(), 44100, 2);
-                mPlayer.setLoop(true);
-            }
-        }
+        mPlayer = new AAudioPlayer(44100, 2);
+        mPlayer.setLoop(true);
     }
 
     @Override

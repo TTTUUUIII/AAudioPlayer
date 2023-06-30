@@ -6,8 +6,14 @@ public class AAudioPlayer {
         System.loadLibrary("aaudiosystem");
     }
 
+    private static final int DEVICE_DEFAULT = 0;
+
     public AAudioPlayer(int deviceId, int sampleRate, int channelCount) {
         if (newPlayer(deviceId, sampleRate, channelCount) == -1) throw new RuntimeException("Failed to create native player!");
+    }
+
+    public AAudioPlayer(int sampleRate, int channelCount) {
+        this(DEVICE_DEFAULT, sampleRate, channelCount);
     }
 
     private native int newPlayer(int deviceId, int sampleRate, int channelCount);

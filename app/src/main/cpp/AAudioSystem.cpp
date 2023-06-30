@@ -36,7 +36,7 @@ JNIEXPORT jint JNICALL
 Java_cn_touchair_aaudioplayer_AAudioPlayer_setDatasource(JNIEnv *env, jobject thiz, jstring jpath) {
     AAudioPlayer *player = find_player_by_obj(env, thiz);
     if (player == nullptr) return JNI_ERR;
-    const char *path = env->GetStringUTFChars(jpath, 0);
+    const char *path = env->GetStringUTFChars(jpath, JNI_FALSE);
     player -> set_data_source(path);
     return NO_ERROR;
 }
