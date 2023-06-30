@@ -3,7 +3,6 @@
 #include <map>
 #include "AAudioPlayer.h"
 #include "Log.h"
-#define NO_ERROR 0
 
 static int32_t get_obj_hashcode(JNIEnv *, jobject);
 static AAudioPlayer *find_player_by_obj(JNIEnv *, jobject);
@@ -38,7 +37,7 @@ Java_cn_touchair_aaudioplayer_AAudioPlayer_setDatasource(JNIEnv *env, jobject th
     if (player == nullptr) return JNI_ERR;
     const char *path = env->GetStringUTFChars(jpath, JNI_FALSE);
     player -> set_data_source(path);
-    return NO_ERROR;
+    return JNI_OK;
 }
 
 extern "C"
@@ -47,7 +46,7 @@ Java_cn_touchair_aaudioplayer_AAudioPlayer_prepare(JNIEnv *env, jobject thiz) {
     AAudioPlayer *player = find_player_by_obj(env, thiz);
     if (player == nullptr) return JNI_ERR;
     player -> prepare();
-    return NO_ERROR;
+    return JNI_OK;
 }
 
 extern "C"
@@ -58,7 +57,7 @@ Java_cn_touchair_aaudioplayer_AAudioPlayer_newPlayer(JNIEnv *env, jobject thiz, 
     if (hashcode == JNI_ERR) return hashcode;
     AAudioPlayer *player = new AAudioPlayer(device_id, sample_rate, channel_count);
     player_map.emplace(hashcode, player);
-    return NO_ERROR;
+    return JNI_OK;
 }
 
 static AAudioPlayer* find_player_by_obj(JNIEnv *env, jobject obj) {
