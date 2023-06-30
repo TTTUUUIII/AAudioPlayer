@@ -28,8 +28,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.restartBtn.setOnClickListener(this);
         binding.resetBtn.setOnClickListener(this);
         binding.setSourceBtn.setOnClickListener(this);
-        mPlayer = new AAudioPlayer(44100, 2);
+        mPlayer = new AAudioPlayer(AAudioPlayer.SAMPLE_RATE_44100K, AAudioPlayer.CHANNEL_OUT_STEREO);
         mPlayer.setLoop(true);
+        mIsLoopMode = true;
+        updateUI();
     }
 
     @Override
@@ -37,6 +39,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         super.onStop();
         if (mPlayer.isPlaying()) {
             mPlayer.stop();
+            binding.stateTextView.setText("STATE_STOPPED");
         }
     }
 
@@ -51,9 +54,13 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         switch (v.getId()) {
             case R.id.pause_btn:
                 mPlayer.pause();
+                mCurrentStatus = "STATE_PAUSED";
+                updateUI();
                 break;
             case R.id.start_btn:
                 mPlayer.start();
+                mCurrentStatus = "STATE_STARED";
+                updateUI();
                 break;
             case R.id.restart_btn:
                 mPlayer.seekTo(0);
@@ -65,6 +72,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                     mPlayer.prepare();
                     mIsShowControlPanel = true;
                     mIsShowSourcePanel = false;
+                    mCurrentStatus = "STATE_PREPARED";
                     updateUI();
                 } else {
                     Toast.makeText(getApplicationContext(), "文件不存在！", Toast.LENGTH_SHORT).show();
@@ -72,6 +80,7 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 break;
             case R.id.reset_btn:
                 mPlayer.reset();
+                mCurrentStatus = "STATE_UNINITIALIZED";
                 mIsShowControlPanel = false;
                 mIsShowSourcePanel = true;
                 updateUI();
@@ -82,11 +91,17 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
     private boolean mIsShowControlPanel = false;
     private boolean mIsShowSourcePanel = true;
 
+    private boolean mIsLoopMode = false;
+
+    private String mCurrentStatus = "STATE_UNINITIALIZED";
+
     public void updateUI() {
         binding.setSourceBtn.setEnabled(mIsShowSourcePanel);
         binding.startBtn.setEnabled(mIsShowControlPanel);
         binding.pauseBtn.setEnabled(mIsShowControlPanel);
         binding.restartBtn.setEnabled(mIsShowControlPanel);
         binding.resetBtn.setEnabled(mIsShowControlPanel);
+        binding.stateTextView.setText(mCurrentStatus);
+        binding.isLoopModeTextView.setText(mIsLoopMode ? "YES" : "NO");
     }
 }
