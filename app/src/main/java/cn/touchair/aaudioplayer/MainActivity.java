@@ -1,7 +1,10 @@
 package cn.touchair.aaudioplayer;
 
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.Manifest;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Toast;
@@ -15,14 +18,18 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
 
     private static final String TAG = MainActivity.class.getSimpleName();
 
+    private static final int REQ_CODE_R_W_EXTERNAL_STORAGE = 1;
     private AAudioPlayer mPlayer;
     private ActivityMainBinding binding;
+
+    private boolean mIsPermissionGranted = false;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMainBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        requestPermission();
         binding.pauseBtn.setOnClickListener(this);
         binding.startBtn.setOnClickListener(this);
         binding.restartBtn.setOnClickListener(this);
@@ -66,6 +73,10 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
                 mPlayer.seekTo(0);
                 break;
             case R.id.set_source_btn:
+                if (!mIsPermissionGranted) {
+                    Toast.makeText(getApplicationContext(), "设置失败，权限不足！", Toast.LENGTH_SHORT).show();
+                    return;
+                }
                 final Path path = Paths.get((binding.editText.getText().toString()));
                 if (path.toFile().exists()) {
                     mPlayer.setDatasource(path.toString());
@@ -103,5 +114,21 @@ public class MainActivity extends AppCompatActivity implements View.OnClickListe
         binding.resetBtn.setEnabled(mIsShowControlPanel);
         binding.stateTextView.setText(mCurrentStatus);
         binding.isLoopModeTextView.setText(mIsLoopMode ? "YES" : "NO");
+    }
+
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        switch (requestCode) {
+            case REQ_CODE_R_W_EXTERNAL_STORAGE:
+                if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) mIsPermissionGranted = true;
+                break;
+        }
+    }
+
+    private void requestPermission() {
+        if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED) {
+            requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, REQ_CODE_R_W_EXTERNAL_STORAGE);
+        } else mIsPermissionGranted = true;
     }
 }
