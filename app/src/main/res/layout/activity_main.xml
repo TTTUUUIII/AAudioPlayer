@@ -59,7 +59,7 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:hint="输入PCM文件路径"
-        android:text="/sdcard/Music/Running in the Night.pcm"
+        android:text="/sdcard/Android/media/cn.touchair.aaudioplayer/Music/Midnight City.pcm"
         app:layout_constraintBottom_toTopOf="@+id/linearLayout"
         app:layout_constraintEnd_toStartOf="@+id/set_source_btn"
         app:layout_constraintStart_toStartOf="parent" />
