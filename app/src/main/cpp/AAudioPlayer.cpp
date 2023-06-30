@@ -15,7 +15,7 @@ void AAudioPlayer::set_data_source(string path) {
 }
 
 int8_t AAudioPlayer::prepare() {
-    LOGD("AAudioPlayer::prepare");
+    LOG_D("AAudioPlayer::prepare");
     if (source_path.empty()) return ERROR;
     source_fin.open(source_path, ios::in | ios::binary);
     if (!AAudioPlayer::source_fin.is_open()) return ERROR;
@@ -27,7 +27,7 @@ int8_t AAudioPlayer::prepare() {
 }
 
 void AAudioPlayer::pause() {
-    LOGD("AAudioPlayer::pause");
+    LOG_D("AAudioPlayer::pause");
     AAudioStream_requestPause(stream);
     waitFor();
     AAudioStream_requestFlush(stream);
@@ -36,27 +36,27 @@ void AAudioPlayer::pause() {
 }
 
 void AAudioPlayer::start() {
-    LOGD("AAudioPlayer::start");
+    LOG_D("AAudioPlayer::start");
     AAudioStream_requestStart(stream);
     waitFor();
     _is_playing = true;
 }
 
 void AAudioPlayer::stop() {
-    LOGD("AAudioPlayer::stop");
+    LOG_D("AAudioPlayer::stop");
     AAudioStream_requestStop(stream);
     waitFor();
     _is_playing = false;
 }
 
 void AAudioPlayer::reset() {
-    LOGD("AAudioPlayer::reset");
+    LOG_D("AAudioPlayer::reset");
     if (_is_playing) stop();
     if (source_fin.is_open()) source_fin.close();
 }
 
 void AAudioPlayer::release() {
-    LOGD("AAudioPlayer::release");
+    LOG_D("AAudioPlayer::release");
     delete this;
 }
 
@@ -69,14 +69,14 @@ aaudio_stream_state_t AAudioPlayer::waitFor() {
 }
 
 void AAudioPlayer::seek_to(float rp) {
-    LOGD("AAudioPlayer::seek_to %f", rp);
+    LOG_D("AAudioPlayer::seek_to %f", rp);
     if (source_fin.is_open()) {
         source_fin.seekg(source_length * rp, ios::beg);
     }
 }
 
 void AAudioPlayer::setLoop(bool is_loop) {
-    LOGD("AAudioPlayer::setLoop %d", is_loop);
+    LOG_D("AAudioPlayer::setLoop %d", is_loop);
     _is_loop = is_loop;
 }
 
@@ -128,7 +128,7 @@ AAudioPlayer::data_callback(AAudioStream *stream, void *userData, void *audioDat
 }
 
 void completed_proc(AAudioPlayer *player) {
-    LOGD("completed_proc called");
+    LOG_D("completed_proc called");
     player -> reset();
     player -> prepare();
     if (player -> is_loop()) {
@@ -140,7 +140,7 @@ void error_proc(AAudioStream *stream, void *userData) {
     AAudioStream_close(stream);
 }
 void AAudioPlayer::error_callback(AAudioStream *stream, void *userData, aaudio_result_t error) {
-    LOGE("AAudioPlayer::error_callback");
+    LOG_E("AAudioPlayer::error_callback");
     thread err_handler(error_proc, stream, userData);
     err_handler.detach();
 }

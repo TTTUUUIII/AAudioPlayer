@@ -2,7 +2,6 @@
 #include <string>
 #include <map>
 #include "AAudioPlayer.h"
-#include "Log.h"
 
 static int32_t get_obj_hashcode(JNIEnv *, jobject);
 static AAudioPlayer *find_player_by_obj(JNIEnv *, jobject);
