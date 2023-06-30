@@ -57,7 +57,7 @@ void AAudioPlayer::reset() {
 
 void AAudioPlayer::release() {
     LOGD("AAudioPlayer::release");
-    free(this);
+    delete this;
 }
 
 aaudio_stream_state_t AAudioPlayer::waitFor() {

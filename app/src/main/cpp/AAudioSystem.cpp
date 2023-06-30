@@ -94,6 +94,7 @@ Java_cn_touchair_aaudioplayer_AAudioPlayer_release(JNIEnv *env, jobject thiz) {
     if (has) {
         AAudioPlayer *player = player_map.at(hashcode);
         player -> release();
+        player_map.erase(hashcode);
     }
 }extern "C"
 JNIEXPORT jboolean JNICALL
