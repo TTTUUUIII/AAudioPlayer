@@ -43,7 +43,7 @@ private:
     static void error_callback(AAudioStream *stream,
                         void *userData,
                         aaudio_result_t error);
-    aaudio_stream_state_t waitFor();
+    aaudio_stream_state_t wait_for();
 };
 
 

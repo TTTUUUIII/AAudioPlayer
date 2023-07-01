@@ -29,23 +29,22 @@ int8_t AAudioPlayer::prepare() {
 void AAudioPlayer::pause() {
     LOG_D("AAudioPlayer::pause");
     AAudioStream_requestPause(stream);
-    waitFor();
     AAudioStream_requestFlush(stream);
-    waitFor();
+    wait_for();
     _is_playing = false;
 }
 
 void AAudioPlayer::start() {
     LOG_D("AAudioPlayer::start");
     AAudioStream_requestStart(stream);
-    waitFor();
+    wait_for();
     _is_playing = true;
 }
 
 void AAudioPlayer::stop() {
     LOG_D("AAudioPlayer::stop");
     AAudioStream_requestStop(stream);
-    waitFor();
+    wait_for();
     _is_playing = false;
 }
 
@@ -60,7 +59,7 @@ void AAudioPlayer::release() {
     delete this;
 }
 
-aaudio_stream_state_t AAudioPlayer::waitFor() {
+aaudio_stream_state_t AAudioPlayer::wait_for() {
     aaudio_stream_state_t current_state = AAudioStream_getState(stream);
     aaudio_stream_state_t next_state = AAUDIO_STREAM_STATE_UNINITIALIZED;
     AAudioStream_waitForStateChange(stream, current_state, &next_state, TIMEOUT_NANO);
