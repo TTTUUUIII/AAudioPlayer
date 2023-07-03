@@ -35,6 +35,7 @@ public class AutoMarqueeTextView extends AppCompatTextView {
 
     @Override
     public void setText(@NonNull CharSequence text, BufferType type) {
+        super.setText(text, type);
         if (text.toString().isEmpty()) return;
         if (mIsInitialized) {
             super.setText(marqueeText(text), type);
